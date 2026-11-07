@@ -1,0 +1,1482 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>For Radhee</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg1: #f7efe7;
+  --bg2: #ecd0cb;
+  --ink: #3d2327;
+  --gold: #b8904f;
+  --gold-light: #d9b57a;
+  --rose: #b76e79;
+  --wine: #3a141c;
+  --lx: 50%;
+  --ly: 30%;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+*, *::before, *::after { box-sizing: inherit; }
+html {
+  scroll-padding-top: env(safe-area-inset-top, 0px);
+  -webkit-text-size-adjust: 100%;
+}
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+}
+body {
+  background: var(--bg1);
+  color: var(--ink);
+  font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-weight: 300;
+  line-height: 1.75;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Background Gradients & Ambient Glow */
+#bg {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: linear-gradient(165deg, var(--bg1), var(--bg2));
+  transition: background 1.4s ease-out;
+  pointer-events: none;
+}
+#glow {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(460px circle at var(--lx) var(--ly), rgba(255, 236, 205, 0.45), transparent 70%);
+  mix-blend-mode: soft-light;
+}
+#gl {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  touch-action: pan-y;
+  display: block;
+}
+
+/* Top Navigation & Audio Cluster */
+.top-nav {
+  position: fixed;
+  z-index: 20;
+  top: max(1rem, env(safe-area-inset-top, 0px));
+  right: clamp(1rem, 3.5vw, 2.5rem);
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  pointer-events: auto;
+}
+.btn {
+  font-family: "DM Sans", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(184, 144, 79, 0.45);
+  padding: 0.55rem 1.15rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.25s ease, box-shadow 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.btn:hover {
+  background: rgba(217, 181, 122, 0.28);
+  border-color: var(--gold-light);
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 14px rgba(184, 144, 79, 0.18);
+}
+:focus-visible {
+  outline: 2px solid var(--gold-light);
+  outline-offset: 3px;
+}
+
+/* Song Player Button & Equalizer */
+#songBtn {
+  background: rgba(255, 250, 245, 0.3);
+  border-color: rgba(184, 144, 79, 0.5);
+  font-size: 0.8rem;
+  padding: 0.5rem 1rem;
+}
+#songBtn.playing {
+  background: rgba(217, 181, 122, 0.22);
+  border-color: var(--gold-light);
+  color: var(--ink);
+}
+.icon-music {
+  font-size: 0.95rem;
+  line-height: 1;
+  color: var(--gold);
+}
+.eq-bars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  width: 12px;
+  height: 12px;
+  padding-bottom: 1px;
+}
+.eq-bars span {
+  display: block;
+  width: 2px;
+  height: 3px;
+  background: var(--gold);
+  border-radius: 1px;
+  transition: height 0.2s ease;
+}
+#songBtn.playing .eq-bars span:nth-child(1) {
+  animation: eqBounce 0.7s infinite alternate ease-in-out;
+}
+#songBtn.playing .eq-bars span:nth-child(2) {
+  animation: eqBounce 0.5s infinite alternate ease-in-out 0.2s;
+}
+#songBtn.playing .eq-bars span:nth-child(3) {
+  animation: eqBounce 0.8s infinite alternate ease-in-out 0.4s;
+}
+@keyframes eqBounce {
+  0% { height: 2px; }
+  100% { height: 11px; }
+}
+
+/* Content Layout */
+main {
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+main a, main button, .panel, .btn {
+  pointer-events: auto;
+}
+section {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding: 12vh clamp(1.5rem, 8vw, 7.5rem);
+  position: relative;
+  overflow: hidden;
+}
+.col {
+  max-width: 34rem;
+  width: 100%;
+}
+.right {
+  justify-content: flex-end;
+}
+.mid {
+  justify-content: center;
+  text-align: center;
+}
+.serif {
+  font-family: "Playfair Display", Georgia, serif;
+  font-weight: 400;
+}
+
+/* Section 1: Opening */
+h1 {
+  font-size: clamp(3.2rem, 11vw, 8.5rem);
+  line-height: 1.02;
+  margin: 0 0 1.6rem;
+  letter-spacing: -0.025em;
+  font-weight: 500;
+}
+h1 .c {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(60%);
+  filter: blur(10px);
+  will-change: transform, opacity, filter;
+}
+.lede {
+  font-size: clamp(1.15rem, 2.4vw, 1.5rem);
+  max-width: 27rem;
+  opacity: 0;
+  font-family: "Playfair Display", Georgia, serif;
+  font-style: italic;
+  line-height: 1.6;
+  margin: 0;
+}
+.hint {
+  position: absolute;
+  bottom: max(2.2rem, env(safe-area-inset-bottom, 0px));
+  left: clamp(1.5rem, 8vw, 7.5rem);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  color: var(--ink);
+}
+.hint i {
+  display: block;
+  width: 1px;
+  height: 44px;
+  background: linear-gradient(to bottom, var(--gold), transparent);
+}
+
+/* Section 2: Realization */
+.big {
+  font-size: clamp(2rem, 5.2vw, 3.8rem);
+  line-height: 1.25;
+  margin: 0;
+  font-weight: 400;
+}
+.halo {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 226, 196, 0.65), transparent 68%);
+  width: 36rem;
+  max-width: 90vw;
+  aspect-ratio: 1;
+}
+.ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(184, 144, 79, 0.45);
+  width: 15rem;
+  aspect-ratio: 1;
+  pointer-events: none;
+}
+
+/* Section 3: The Apology Panel */
+.panel {
+  background: rgba(255, 250, 246, 0.68);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(184, 144, 79, 0.42);
+  border-radius: 24px;
+  padding: clamp(1.7rem, 4.5vw, 3rem);
+  box-shadow: 0 30px 80px -30px rgba(120, 50, 60, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+.panel p {
+  margin: 0 0 1.4rem;
+  font-size: clamp(1.02rem, 1.7vw, 1.15rem);
+  line-height: 1.85;
+  color: #32181d;
+  font-weight: 400;
+}
+.panel p:last-child {
+  margin: 0;
+  font-family: "Playfair Display", Georgia, serif;
+  font-style: italic;
+  font-size: clamp(1.18rem, 2vw, 1.38rem);
+  color: #240e13;
+  font-weight: 500;
+}
+
+/* Section 4: A Promise */
+.pr {
+  position: relative;
+  padding-left: 1.8rem;
+  margin: 0 0 2.4rem;
+}
+.pr:last-child {
+  margin-bottom: 0;
+}
+.pr .bar {
+  position: absolute;
+  left: 0;
+  top: 0.35em;
+  bottom: 0.35em;
+  width: 2px;
+  background: var(--gold);
+  transform-origin: top;
+}
+.pr p {
+  margin: 0;
+  font-size: clamp(1.4rem, 3.1vw, 2.1rem);
+  line-height: 1.35;
+  font-weight: 500;
+  color: #32181d;
+}
+
+/* Section 5: The Finale */
+.fin {
+  background: transparent;
+  color: #ffffff;
+  padding-top: 14vh;
+  padding-bottom: 12vh;
+}
+.fin .col {
+  margin: 0 auto;
+  max-width: 38rem;
+  position: relative;
+  z-index: 5;
+}
+.fin-box {
+  background: rgba(30, 8, 14, 0.76);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(217, 181, 122, 0.45);
+  border-radius: 28px;
+  padding: clamp(2.2rem, 5vw, 3.4rem);
+  box-shadow: 0 35px 90px -20px rgba(0, 0, 0, 0.85), 0 0 50px rgba(183, 110, 121, 0.15), inset 0 1px 0 rgba(217, 181, 122, 0.35);
+  text-align: center;
+}
+.fin p {
+  margin: 0 0 1.3rem;
+  font-size: clamp(1.1rem, 2.1vw, 1.35rem);
+  line-height: 1.8;
+  color: #f7e6e9;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+}
+.fin .name {
+  font-size: clamp(1.75rem, 3.4vw, 2.5rem);
+  line-height: 1.3;
+  margin-bottom: 1.8rem;
+  color: #ffffff;
+  font-weight: 500;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.8);
+}
+.fin .final-heart {
+  color: #ffccd5;
+  font-size: clamp(1.25rem, 2.3vw, 1.5rem);
+}
+.sig {
+  font-family: "Playfair Display", Georgia, serif;
+  font-style: italic;
+  color: #eed095;
+  font-size: 1.9rem;
+  margin: 2.2rem 0;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
+}
+#open {
+  color: #ffffff;
+  background: rgba(217, 181, 122, 0.18);
+  border: 1px solid rgba(217, 181, 122, 0.75);
+  padding: 1rem 2.2rem;
+  font-size: 0.98rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  transition: background 0.35s ease, transform 0.3s ease, border-color 0.3s ease, box-shadow 0.35s ease;
+}
+#open:hover {
+  background: rgba(217, 181, 122, 0.32);
+  border-color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(217, 181, 122, 0.35);
+}
+
+/* Word Reveal Spans */
+.w {
+  display: inline;
+  will-change: opacity;
+}
+
+/* The Personal Message Modal */
+#msg {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: clamp(1.2rem, 3vw, 2rem);
+  background: rgba(24, 7, 11, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s ease;
+}
+#msg.on {
+  opacity: 1;
+  visibility: visible;
+}
+#msg .card {
+  max-width: 35rem;
+  width: 100%;
+  max-height: 88vh;
+  overflow-y: auto;
+  color: #f7efe7;
+  background: linear-gradient(160deg, rgba(62, 22, 30, 0.94), rgba(33, 11, 17, 0.98));
+  border: 1px solid rgba(217, 181, 122, 0.55);
+  border-radius: 26px;
+  padding: clamp(1.8rem, 5vw, 3.2rem);
+  box-shadow: 0 35px 90px -25px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(217, 181, 122, 0.35);
+  transform: translateY(28px) scale(0.96);
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto;
+}
+#msg.on .card {
+  transform: none;
+}
+#msg p {
+  margin: 0 0 1.25rem;
+  font-size: clamp(1rem, 1.8vw, 1.12rem);
+  line-height: 1.8;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+#msg.on p {
+  opacity: 1;
+  transform: none;
+}
+#msg.on p:nth-child(1) { transition-delay: 0.1s; }
+#msg.on p:nth-child(2) { transition-delay: 0.5s; }
+#msg.on p:nth-child(3) { transition-delay: 1.0s; }
+#msg.on p:nth-child(4) { transition-delay: 1.5s; }
+#msg.on p:nth-child(5) { transition-delay: 2.0s; }
+
+#close {
+  margin-top: 1.2rem;
+  color: #f7efe7;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(217, 181, 122, 0.6);
+  padding: 0.75rem 1.8rem;
+}
+#close:hover {
+  background: rgba(217, 181, 122, 0.25);
+  border-color: #f7efe7;
+}
+
+/* Hidden YouTube Player Frame for audio streaming */
+#ytFrameWrap {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  left: -9999px;
+  top: -9999px;
+}
+
+/* Responsive & Mobile Optimization */
+@media (max-width: 760px) {
+  .right {
+    justify-content: flex-start;
+  }
+  section {
+    padding-top: 14vh;
+    padding-bottom: 14vh;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  .col {
+    max-width: 100%;
+  }
+  .top-nav {
+    right: 1rem;
+    gap: 0.45rem;
+  }
+  .btn {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.75rem;
+  }
+  #songBtn .song-label {
+    max-width: 110px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .fin .col {
+    padding-top: 26vh;
+  }
+}
+
+/* Accessibility: prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+  h1 .c, .lede, .hint, #msg p {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+  .w {
+    opacity: 1 !important;
+  }
+  .bar {
+    transform: none !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div id="bg"></div>
+<div id="glow"></div>
+<canvas id="gl" aria-hidden="true"></canvas>
+
+<!-- Top Controls: Sound toggle & Song Player -->
+<header class="top-nav" aria-label="Audio controls">
+  <button id="songBtn" class="btn" aria-pressed="false" title="Song: Ab Jane Do Ab Chhodo Bhi">
+    <span class="icon-music" aria-hidden="true">♪</span>
+    <span class="song-label">Ab Jane Do Ab Chhodo Bhi</span>
+    <span class="eq-bars" aria-hidden="true">
+      <span></span><span></span><span></span>
+    </span>
+  </button>
+  <button id="snd" class="btn" aria-pressed="false">Sound off</button>
+</header>
+
+<!-- Hidden YouTube Audio Player Container -->
+<div id="ytFrameWrap" aria-hidden="true">
+  <div id="ytPlayer"></div>
+</div>
+
+<!-- Optional local/online audio fallback -->
+<audio id="bgSongAudio" preload="none" loop></audio>
+
+<main>
+  <!-- SECTION 1: THE OPENING -->
+  <section data-bg1="#f7efe7" data-bg2="#ecd0cb" data-ink="#3d2327">
+    <div class="col">
+      <h1 class="serif" id="hero" aria-label="Hey Radhee…">Hey Radhee…</h1>
+      <p class="lede" id="lede">I know I’ve made a lot of mistakes, and I know you’re angry with me.</p>
+    </div>
+    <div class="hint" id="hint"><i></i>Scroll slowly</div>
+  </section>
+
+  <!-- SECTION 2: A LITTLE REALIZATION -->
+  <section class="right" data-bg1="#f3e2dc" data-bg2="#e3b9b8" data-ink="#3d2327">
+    <div class="halo" style="left:-8rem;top:10%" data-speed="-18"></div>
+    <div class="ring" style="right:12%;top:14%" data-speed="25"></div>
+    <div class="col">
+      <p class="big serif" data-rv>Sometimes, we realise our mistakes a little too late.</p>
+    </div>
+  </section>
+
+  <!-- SECTION 3: THE APOLOGY -->
+  <section data-bg1="#f8eee6" data-bg2="#e9c7c2" data-ink="#3a2125">
+    <div class="col panel">
+      <p data-rv>Radhee, mujhe pata hai meri kuch galtiyon ki wajah se tum hurt hui ho aur mujhse tang aa gayi ho. Main apni galti ko justify nahi karunga, na hi koi bahana banaunga.</p>
+      <p data-rv>I’m genuinely sorry. I should have thought about how my words and actions would affect you. Tumhari feelings important hain.</p>
+      <p data-rv>Main yeh expect nahi kar raha ki tum turant sab bhool jao ya mujhe maaf kar do. Trust sirf sorry bolne se wapas nahi aata — woh actions se earn karna padta hai.</p>
+      <p data-rv>I’ll try to do better, not just say better things.</p>
+    </div>
+  </section>
+
+  <!-- SECTION 4: A PROMISE -->
+  <section class="right" data-bg1="#efd8d3" data-bg2="#d9a5a8" data-ink="#3a2125">
+    <div class="halo" style="right:-10rem;bottom:0" data-speed="-22"></div>
+    <div class="col">
+      <div class="pr"><i class="bar"></i><p class="serif" data-rv>I’ll listen instead of arguing.</p></div>
+      <div class="pr"><i class="bar"></i><p class="serif" data-rv>I’ll understand instead of assuming.</p></div>
+      <div class="pr"><i class="bar"></i><p class="serif" data-rv>I’ll improve through my actions, not just words.</p></div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: THE FINAL MESSAGE -->
+  <section class="mid fin" data-bg1="#3a141c" data-bg2="#1d0a10" data-ink="#ffffff">
+    <div class="col fin-box">
+      <p class="serif name" data-rv>Thank you for being a part of my life, Radhee.</p>
+      <p data-rv>I don’t expect an immediate reply.</p>
+      <p data-rv>I just wanted you to know that I’m genuinely sorry.</p>
+      <p class="serif final-heart" style="font-style:italic" data-rv>Take your time. ❤️</p>
+      <div class="sig">— Ansh</div>
+      <button class="btn" id="open">A little message for you ♡</button>
+    </div>
+  </section>
+</main>
+
+<!-- SECTION 5 MODAL: THE PERSONAL MESSAGE -->
+<div id="msg" role="dialog" aria-modal="true" aria-labelledby="mt" aria-hidden="true">
+  <div class="card">
+    <p id="mt" class="serif" style="font-size:1.75rem;margin-bottom:1.4rem;">Radhee,</p>
+    <p>Mujhe pata hai tumne mujhe pehle bhi kai baar maaf kiya hai, aur meri galti bhi wahi hai — main cheezein bhool jata hoon. Is baar tumhara gussa bahut zyada hai, aur woh bilkul jayaz hai.</p>
+    <p>Mujhe tumhari apne se bhi zyada care hai, aur main tumse bahut pyaar karta hoon. Tumne jo space maangi hai, main use poori respect ke saath dunga — bina koi pressure daale.</p>
+    <p>Tum bahut pure dil ki ho, Radhee, aur main tumhe kabhi kho nahi dena chahta. Isliye is baar main sirf bolunga nahi, badal ke dikhaunga.</p>
+    <p class="serif" style="font-style:italic;color:#d9b57a;font-size:1.25rem;">Apna khayal rakhna. — Ansh</p>
+    <button class="btn" id="close">Close</button>
+  </div>
+</div>
+
+<!-- PINNED EXTERNAL SCRIPTS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+(()=>{
+"use strict";
+
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const isMobile = innerWidth < 760;
+const root = document.documentElement;
+const $ = s => document.querySelector(s);
+
+let soundEnabled = false;
+let isSongPlaying = false;
+let audioCtx = null;
+let targetScrollProgress = 0;
+const heartInteraction = { beat: 0, burst: 0 };
+
+if (window.gsap && window.ScrollTrigger) {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
+/* -------------------------------------------------------------
+   AUDIO SYSTEM (Sine Chime + Song: "Ab Jane Do Ab Chhodo Bhi")
+   ------------------------------------------------------------- */
+function getAudioContext() {
+  if (!audioCtx) {
+    try {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextClass) {
+        audioCtx = new AudioContextClass();
+      }
+    } catch (e) {
+      console.warn("AudioContext init error:", e);
+    }
+  }
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  return audioCtx;
+}
+
+// Two-note sine chime on heart click & modal open
+function playChime() {
+  if (!soundEnabled) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  [660, 990].forEach((freq, idx) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const startTime = ctx.currentTime + idx * 0.09;
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, startTime);
+    gain.gain.setValueAtTime(0, startTime);
+    gain.gain.linearRampToValueAtTime(0.045, startTime + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 1.35);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(startTime);
+    osc.stop(startTime + 1.4);
+  });
+}
+
+// Procedural Melodic Synth for "Ab Jane Do Ab Chhodo Bhi" (Bhoothnath)
+let synthMelodyTimer = null;
+let melodyActive = false;
+
+// Note frequencies in Hz
+const N_E2 = 82.41, N_GS2 = 103.83, N_A2 = 110.00, N_B2 = 123.47, N_CS3 = 138.59, N_E3 = 164.81, N_FS3 = 185.00, N_GS3 = 207.65, N_A3 = 220.00, N_B3 = 246.94, N_CS4 = 277.18, N_DS4 = 311.13, N_E4 = 329.63, N_FS4 = 369.99, N_GS4 = 415.30, N_A4 = 440.00, N_B4 = 493.88, N_CS5 = 554.37, N_DS5 = 622.25, N_E5 = 659.25;
+
+// Acoustic tone synthesizer for piano/music-box melody
+function playSynthNote(ctx, freq, time, duration, vol = 0.035) {
+  if (!melodyActive) return;
+  const osc = ctx.createOscillator();
+  const osc2 = ctx.createOscillator();
+  const gain = ctx.createGain();
+  const filter = ctx.createBiquadFilter();
+
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(1400, time);
+
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(freq, time);
+
+  osc2.type = 'triangle';
+  osc2.frequency.setValueAtTime(freq * 2, time);
+
+  gain.gain.setValueAtTime(0.0001, time);
+  gain.gain.linearRampToValueAtTime(vol, time + 0.02);
+  gain.gain.exponentialRampToValueAtTime(vol * 0.4, time + duration * 0.4);
+  gain.gain.exponentialRampToValueAtTime(0.00001, time + duration);
+
+  osc.connect(filter);
+  osc2.connect(filter);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc.start(time);
+  osc2.start(time);
+  osc.stop(time + duration);
+  osc2.stop(time + duration);
+}
+
+// Warm chord pad in background
+function playWarmChord(ctx, freqs, time, duration, vol = 0.016) {
+  if (!melodyActive) return;
+  freqs.forEach(f => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(750, time);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(f, time);
+    gain.gain.setValueAtTime(0.0001, time);
+    gain.gain.linearRampToValueAtTime(vol, time + 0.3);
+    gain.gain.exponentialRampToValueAtTime(0.00001, time + duration);
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(time);
+    osc.stop(time + duration);
+  });
+}
+
+// Sequence of "Chalo Jaane Do, Ab Chhodo Bhi"
+const songSequence = [
+  // Phrase 1: Chalo jaane do (B4 G#4 E4 F#4 G#4)
+  { f: N_B4, d: 0.35, pause: 0.1, chord: [N_E3, N_B3, N_GS4] },
+  { f: N_GS4, d: 0.45, pause: 0.15 },
+  { f: N_E4, d: 0.3, pause: 0.05 },
+  { f: N_FS4, d: 0.3, pause: 0.05 },
+  { f: N_GS4, d: 0.65, pause: 0.3 },
+
+  // Phrase 2: Ab chhodo bhi (FS4 E4 DS4 E4)
+  { f: N_FS4, d: 0.35, pause: 0.05, chord: [N_CS3, N_GS3, N_E4] },
+  { f: N_E4, d: 0.35, pause: 0.05 },
+  { f: N_DS4, d: 0.35, pause: 0.05, chord: [N_B2, N_FS3, N_DS4] },
+  { f: N_E4, d: 0.75, pause: 0.45 },
+
+  // Phrase 3: Itna bhi kya gussa karna (B3 E4 GS4 B4 CS5 B4 A4 GS4 FS4)
+  { f: N_B3, d: 0.3, pause: 0.05, chord: [N_A2, N_E3, N_CS4] },
+  { f: N_E4, d: 0.3, pause: 0.05 },
+  { f: N_GS4, d: 0.35, pause: 0.05 },
+  { f: N_B4, d: 0.4, pause: 0.08 },
+  { f: N_CS5, d: 0.35, pause: 0.05 },
+  { f: N_B4, d: 0.35, pause: 0.05 },
+  { f: N_A4, d: 0.35, pause: 0.05 },
+  { f: N_GS4, d: 0.35, pause: 0.05 },
+  { f: N_FS4, d: 0.75, pause: 0.35, chord: [N_B2, N_FS3, N_DS4] },
+
+  // Phrase 4: Kuch apni kaho, kuch meri suno
+  { f: N_E4, d: 0.3, pause: 0.05, chord: [N_E3, N_B3, N_GS3] },
+  { f: N_FS4, d: 0.3, pause: 0.05 },
+  { f: N_GS4, d: 0.45, pause: 0.15 },
+  { f: N_E4, d: 0.45, pause: 0.2 },
+  { f: N_FS4, d: 0.3, pause: 0.05, chord: [N_A2, N_E3, N_CS4] },
+  { f: N_GS4, d: 0.3, pause: 0.05 },
+  { f: N_A4, d: 0.45, pause: 0.15 },
+  { f: N_FS4, d: 0.65, pause: 0.35, chord: [N_B2, N_FS3, N_DS4] },
+
+  // Phrase 5: Yun chup chup rehkar dil hi dil mein kya kudhna
+  { f: N_GS4, d: 0.3, pause: 0.05, chord: [N_CS3, N_GS3, N_E4] },
+  { f: N_A4, d: 0.3, pause: 0.05 },
+  { f: N_B4, d: 0.4, pause: 0.1, chord: [N_A2, N_E3, N_CS4] },
+  { f: N_A4, d: 0.35, pause: 0.05 },
+  { f: N_GS4, d: 0.35, pause: 0.05 },
+  { f: N_FS4, d: 0.35, pause: 0.05, chord: [N_B2, N_FS3, N_DS4] },
+  { f: N_DS4, d: 0.35, pause: 0.05 },
+  { f: N_E4, d: 0.9, pause: 0.8, chord: [N_E3, N_B3, N_GS4] }
+];
+
+function startProceduralMelody() {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  melodyActive = true;
+
+  function scheduleLoop() {
+    if (!melodyActive) return;
+    let t = ctx.currentTime + 0.1;
+    songSequence.forEach(n => {
+      if (n.chord) {
+        playWarmChord(ctx, n.chord, t, 1.8, 0.016);
+      }
+      playSynthNote(ctx, n.f, t, n.d, 0.038);
+      t += n.d + n.pause;
+    });
+    const totalDuration = (t - ctx.currentTime) * 1000;
+    synthMelodyTimer = setTimeout(scheduleLoop, Math.max(100, totalDuration));
+  }
+  scheduleLoop();
+}
+
+function stopProceduralMelody() {
+  melodyActive = false;
+  if (synthMelodyTimer) {
+    clearTimeout(synthMelodyTimer);
+    synthMelodyTimer = null;
+  }
+}
+
+// YouTube Player & HTML5 Audio Integration
+let ytPlayer = null;
+let ytReady = false;
+const bgAudio = $('#bgSongAudio');
+bgAudio.src = 'song.mp3';
+
+window.onYouTubeIframeAPIReady = function() {
+  try {
+    ytPlayer = new YT.Player('ytPlayer', {
+      height: '160',
+      width: '240',
+      videoId: 'GIvWCOShABQ', // T-Series Bhoothnath: "Chalo Jaane Do / Ab Jaane Do Ab Chhodo Bhi"
+      playerVars: {
+        autoplay: 0,
+        controls: 0,
+        disablekb: 1,
+        fs: 0,
+        modestbranding: 1,
+        rel: 0,
+        loop: 1,
+        playlist: 'GIvWCOShABQ'
+      },
+      events: {
+        onReady: function(e) {
+          ytReady = true;
+          if (isSongPlaying && bgAudio.paused) {
+            e.target.setVolume(55);
+            e.target.playVideo();
+            stopProceduralMelody();
+          }
+        },
+        onError: function() {
+          if (isSongPlaying && !melodyActive) {
+            startProceduralMelody();
+          }
+        }
+      }
+    });
+  } catch (err) {
+    console.warn("YouTube iframe init error:", err);
+  }
+};
+
+// Load YouTube Iframe API asynchronously
+const ytScript = document.createElement('script');
+ytScript.src = "https://www.youtube.com/iframe_api";
+document.head.appendChild(ytScript);
+
+const songBtn = $('#songBtn');
+const sndBtn = $('#snd');
+
+function updateSongUI(playing) {
+  isSongPlaying = playing;
+  songBtn.classList.toggle('playing', playing);
+  songBtn.setAttribute('aria-pressed', playing);
+}
+
+function playSong() {
+  getAudioContext();
+  updateSongUI(true);
+
+  if (!soundEnabled) {
+    soundEnabled = true;
+    sndBtn.textContent = 'Sound on';
+    sndBtn.setAttribute('aria-pressed', 'true');
+  }
+
+  // 1. Try local audio if present
+  bgAudio.play().then(() => {
+    stopProceduralMelody();
+    if (ytReady && ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
+      try { ytPlayer.pauseVideo(); } catch (e) {}
+    }
+  }).catch(() => {
+    // 2. Try YouTube streaming
+    if (ytReady && ytPlayer && typeof ytPlayer.playVideo === 'function') {
+      try {
+        ytPlayer.setVolume(55);
+        ytPlayer.playVideo();
+        stopProceduralMelody();
+        return;
+      } catch (e) {
+        console.warn("YT play fallback:", e);
+      }
+    }
+    // 3. Fallback to procedural soothing synth melody
+    startProceduralMelody();
+  });
+}
+
+function pauseSong() {
+  updateSongUI(false);
+  bgAudio.pause();
+  if (ytReady && ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
+    try { ytPlayer.pauseVideo(); } catch (e) {}
+  }
+  stopProceduralMelody();
+}
+
+songBtn.addEventListener('click', () => {
+  if (isSongPlaying) {
+    pauseSong();
+  } else {
+    playSong();
+  }
+});
+
+// Master Sound Toggle
+sndBtn.addEventListener('click', () => {
+  soundEnabled = !soundEnabled;
+  sndBtn.textContent = soundEnabled ? 'Sound on' : 'Sound off';
+  sndBtn.setAttribute('aria-pressed', soundEnabled);
+  getAudioContext();
+
+  if (soundEnabled) {
+    playChime();
+  } else {
+    if (isSongPlaying) {
+      pauseSong();
+    }
+  }
+});
+
+/* -------------------------------------------------------------
+   THE PERSONAL MESSAGE MODAL
+   ------------------------------------------------------------- */
+const msg = $('#msg');
+const openBtn = $('#open');
+const closeBtn = $('#close');
+
+function setModalOpen(open) {
+  msg.classList.toggle('on', open);
+  msg.setAttribute('aria-hidden', !open);
+  if (open) {
+    playChime();
+    heartInteraction.burst = 1;
+    closeBtn.focus();
+  } else {
+    openBtn.focus();
+  }
+}
+
+openBtn.addEventListener('click', () => setModalOpen(true));
+closeBtn.addEventListener('click', () => setModalOpen(false));
+msg.addEventListener('click', e => {
+  if (e.target === msg) setModalOpen(false);
+});
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && msg.classList.contains('on')) {
+    setModalOpen(false);
+  }
+});
+
+/* -------------------------------------------------------------
+   TEXT & SCROLL CHOREOGRAPHY (GSAP + ScrollTrigger)
+   ------------------------------------------------------------- */
+function splitWords(el) {
+  const words = el.textContent.trim().split(/\s+/);
+  el.innerHTML = words.map(w => `<span class="w">${w}</span>`).join(' ');
+  return el.querySelectorAll('.w');
+}
+
+const hero = $('#hero');
+const heroChars = [...hero.textContent];
+hero.innerHTML = heroChars.map(c => `<span class="c" aria-hidden="true">${c === ' ' ? '&nbsp;' : c}</span>`).join('');
+
+if (window.gsap && !RM) {
+  // Opening hero load animation
+  gsap.timeline({ delay: 0.35 })
+    .to('.c', {
+      opacity: 1,
+      y: 0,
+      filter: 'blur(0px)',
+      duration: 1.4,
+      ease: 'power3.out',
+      stagger: 0.075
+    })
+    .to('#lede', {
+      opacity: 1,
+      duration: 1.6,
+      ease: 'power2.out'
+    }, '-=0.4')
+    .to('#hint', {
+      opacity: 0.75,
+      duration: 1.2,
+      ease: 'power2.out'
+    }, '-=0.5');
+
+  // Word-by-word reveal for sections 1 to 4
+  document.querySelectorAll('section:not(.fin) [data-rv]').forEach(el => {
+    const w = splitWords(el);
+    gsap.fromTo(w,
+      { opacity: 0.16 },
+      {
+        opacity: 1,
+        ease: 'none',
+        stagger: 0.12,
+        scrollTrigger: {
+          trigger: el,
+          start: 'top 86%',
+          end: 'bottom 58%',
+          scrub: 0.6
+        }
+      }
+    );
+  });
+
+  // Dedicated word-by-word reveal for Section 5 (The Finale)
+  // Ensures ALL lines and words in Section 5 reveal to crisp 100% full opacity as the section comes into view
+  document.querySelectorAll('.fin [data-rv]').forEach(el => {
+    const w = splitWords(el);
+    gsap.fromTo(w,
+      { opacity: 0.25 },
+      {
+        opacity: 1,
+        ease: 'power2.out',
+        stagger: 0.07,
+        scrollTrigger: {
+          trigger: '.fin',
+          start: 'top 75%',
+          end: 'top 20%',
+          scrub: 0.5
+        }
+      }
+    );
+  });
+
+  // Section 4 Promise Bars scaleY animation
+  document.querySelectorAll('.bar').forEach(bar => {
+    gsap.from(bar, {
+      scaleY: 0,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: bar.parentNode,
+        start: 'top 85%',
+        end: 'top 55%',
+        scrub: true
+      }
+    });
+  });
+
+  // Parallax rings & halos
+  document.querySelectorAll('[data-speed]').forEach(item => {
+    gsap.to(item, {
+      y: +item.dataset.speed * 10,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: item.parentNode,
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: true
+      }
+    });
+  });
+
+  // Section background gradient transitions
+  document.querySelectorAll('section').forEach(sec => {
+    ScrollTrigger.create({
+      trigger: sec,
+      start: 'top 55%',
+      end: 'bottom 55%',
+      onToggle: self => {
+        if (self.isActive) {
+          gsap.to(root, {
+            '--bg1': sec.dataset.bg1,
+            '--bg2': sec.dataset.bg2,
+            '--ink': sec.dataset.ink,
+            duration: 1.4,
+            ease: 'power2.out',
+            overwrite: 'auto'
+          });
+        }
+      }
+    });
+  });
+
+  // Track scroll progress for 3D synchronization
+  ScrollTrigger.create({
+    start: 0,
+    end: 'max',
+    onUpdate: self => {
+      targetScrollProgress = self.progress;
+    }
+  });
+
+} else {
+  // Reduced motion or fallback: make content immediately readable
+  document.querySelectorAll('.c, #lede, #hint').forEach(el => {
+    el.style.opacity = '1';
+    el.style.transform = 'none';
+    el.style.filter = 'none';
+  });
+  const finaleSec = $('.fin');
+  const handleScroll = () => {
+    targetScrollProgress = scrollY / Math.max(1, root.scrollHeight - innerHeight);
+    const rect = finaleSec.getBoundingClientRect();
+    const isDark = rect.top < innerHeight * 0.55;
+    root.style.setProperty('--bg1', isDark ? '#3a141c' : '#f7efe7');
+    root.style.setProperty('--bg2', isDark ? '#1d0a10' : '#ecd0cb');
+    root.style.setProperty('--ink', isDark ? '#f7efe7' : '#3d2327');
+  };
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  handleScroll();
+}
+
+/* -------------------------------------------------------------
+   CURSOR-FOLLOWING SOFT GOLDEN LIGHT (Desktop only)
+   ------------------------------------------------------------- */
+const mouse = { x: 0, y: 0 };
+window.addEventListener('pointermove', e => {
+  mouse.x = (e.clientX / innerWidth) * 2 - 1;
+  mouse.y = (e.clientY / innerHeight) * 2 - 1;
+  if (e.pointerType === 'mouse' && !RM) {
+    root.style.setProperty('--lx', e.clientX + 'px');
+    root.style.setProperty('--ly', e.clientY + 'px');
+  }
+}, { passive: true });
+
+/* -------------------------------------------------------------
+   THREE.JS PROCEDURAL 3D SCENE
+   ------------------------------------------------------------- */
+function init3D() {
+  const canvas = $('#gl');
+  if (!canvas) return;
+
+  const renderer = new THREE.WebGLRenderer({
+    canvas: canvas,
+    antialias: !isMobile,
+    alpha: true,
+    powerPreference: 'high-performance'
+  });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.08;
+  renderer.outputEncoding = THREE.sRGBEncoding;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 50);
+  camera.position.z = 9;
+
+  // Procedural Studio Environment for Glass Reflections
+  const envCanvas = document.createElement('canvas');
+  envCanvas.width = 512;
+  envCanvas.height = 256;
+  const ctx2d = envCanvas.getContext('2d');
+  const gradient = ctx2d.createLinearGradient(0, 0, 0, 256);
+  gradient.addColorStop(0, '#ffe8df');
+  gradient.addColorStop(0.5, '#c96678');
+  gradient.addColorStop(1, '#3b121c');
+  ctx2d.fillStyle = gradient;
+  ctx2d.fillRect(0, 0, 512, 256);
+
+  // Soft-box highlights
+  ctx2d.fillStyle = 'rgba(255, 235, 225, 0.55)';
+  ctx2d.fillRect(60, 35, 95, 75);
+  ctx2d.fillRect(340, 25, 70, 95);
+  ctx2d.fillStyle = 'rgba(235, 185, 145, 0.5)';
+  ctx2d.fillRect(210, 85, 45, 125);
+
+  const envTexture = new THREE.CanvasTexture(envCanvas);
+  envTexture.mapping = THREE.EquirectangularReflectionMapping;
+  const pmremGen = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmremGen.fromEquirectangular(envTexture).texture;
+
+  // Scene Lighting
+  scene.add(new THREE.AmbientLight(0xffdfe3, 0.5));
+  const keyLight = new THREE.DirectionalLight(0xffecd8, 1.15);
+  keyLight.position.set(3.2, 4.2, 5.0);
+  scene.add(keyLight);
+
+  const rosePointLight = new THREE.PointLight(0xd94b68, 1.2, 22);
+  rosePointLight.position.set(-4, -2, 3);
+  scene.add(rosePointLight);
+
+  const goldRimLight = new THREE.PointLight(0xe8b870, 1.2, 22);
+  goldRimLight.position.set(4, -3, -2);
+  scene.add(goldRimLight);
+
+  // 1. Procedural Floating Glass Heart
+  const heartShape = new THREE.Shape();
+  heartShape.moveTo(0.25, 0.25);
+  heartShape.bezierCurveTo(0.25, 0.25, 0.2, 0, 0, 0);
+  heartShape.bezierCurveTo(-0.3, 0, -0.3, 0.35, -0.3, 0.35);
+  heartShape.bezierCurveTo(-0.3, 0.55, -0.15, 0.77, 0.25, 0.95);
+  heartShape.bezierCurveTo(0.6, 0.77, 0.8, 0.55, 0.8, 0.35);
+  heartShape.bezierCurveTo(0.8, 0.35, 0.8, 0, 0.5, 0);
+  heartShape.bezierCurveTo(0.35, 0, 0.25, 0.25, 0.25, 0.25);
+
+  const heartGeo = new THREE.ExtrudeGeometry(heartShape, {
+    depth: 0.28,
+    bevelEnabled: true,
+    bevelThickness: 0.14,
+    bevelSize: 0.1,
+    bevelSegments: isMobile ? 4 : 8,
+    curveSegments: isMobile ? 18 : 32
+  });
+  heartGeo.center();
+  heartGeo.scale(1.7, -1.7, 1.7);
+
+  const glassMaterial = new THREE.MeshPhysicalMaterial({
+    color: 0xdc4868,
+    metalness: 0.05,
+    roughness: 0.1,
+    clearcoat: 0.85,
+    clearcoatRoughness: 0.08,
+    transparent: true,
+    opacity: 0.72,
+    envMapIntensity: 0.95,
+    side: THREE.FrontSide
+  });
+  const glassHeart = new THREE.Mesh(heartGeo, glassMaterial);
+
+  const coreMaterial = new THREE.MeshStandardMaterial({
+    color: 0xa31e36,
+    emissive: 0x781226,
+    emissiveIntensity: 0.65,
+    roughness: 0.3,
+    metalness: 0.15
+  });
+  const innerHeart = new THREE.Mesh(heartGeo, coreMaterial);
+  innerHeart.scale.setScalar(0.55);
+
+  const heartGroup = new THREE.Group();
+  heartGroup.add(innerHeart, glassHeart);
+  scene.add(heartGroup);
+
+  // 2. Procedural Delicate 3D Rose (blooms in final section)
+  const roseGroup = new THREE.Group();
+  const petalGeo = new THREE.SphereGeometry(1, 14, 8, 0, Math.PI * 0.95, 0, Math.PI * 0.55);
+  const roseLayers = [
+    [5, 0.10, 0.25, 0.20],
+    [6, 0.20, 0.40, 0.42],
+    [8, 0.32, 0.55, 0.70]
+  ];
+
+  roseLayers.forEach(([petalCount, radius, scale, tilt], layerIdx) => {
+    for (let i = 0; i < petalCount; i++) {
+      const petalMat = new THREE.MeshStandardMaterial({
+        color: new THREE.Color().setHSL(0.96, 0.62, 0.42 + layerIdx * 0.07),
+        roughness: 0.45,
+        side: THREE.DoubleSide
+      });
+      const petalMesh = new THREE.Mesh(petalGeo, petalMat);
+      const angle = (i / petalCount) * Math.PI * 2 + layerIdx * 0.5;
+      petalMesh.position.set(Math.cos(angle) * radius, layerIdx * -0.04, Math.sin(angle) * radius);
+      petalMesh.rotation.set(0, -angle + Math.PI / 2, 0);
+      petalMesh.rotateX(-tilt);
+      petalMesh.scale.set(scale, scale * 0.9, scale * 0.6);
+      roseGroup.add(petalMesh);
+    }
+  });
+
+  const budMesh = new THREE.Mesh(
+    new THREE.SphereGeometry(0.12, 16, 12),
+    new THREE.MeshStandardMaterial({ color: 0x781226, roughness: 0.45 })
+  );
+  budMesh.position.y = 0.02;
+  roseGroup.add(budMesh);
+  roseGroup.rotation.x = 0.9;
+  scene.add(roseGroup);
+
+  // 3. Falling Rose Petals
+  const petalCount = isMobile ? 28 : 60;
+  const petalShape = new THREE.Shape();
+  petalShape.moveTo(0, -0.13);
+  petalShape.bezierCurveTo(0.1, -0.06, 0.11, 0.07, 0, 0.14);
+  petalShape.bezierCurveTo(-0.11, 0.07, -0.1, -0.06, 0, -0.13);
+  const petalShapeGeo = new THREE.ShapeGeometry(petalShape, 8);
+  const posAttr = petalShapeGeo.attributes.position;
+  for (let i = 0; i < posAttr.count; i++) {
+    const px = posAttr.getX(i), py = posAttr.getY(i);
+    posAttr.setZ(i, (px * px * 3.5) + (py * py * 1.5));
+  }
+  petalShapeGeo.computeVertexNormals();
+
+  const petalInstancedMesh = new THREE.InstancedMesh(
+    petalShapeGeo,
+    new THREE.MeshStandardMaterial({ roughness: 0.55, side: THREE.DoubleSide }),
+    petalCount
+  );
+
+  const petalData = [];
+  const tempColor = new THREE.Color();
+  const petalHexColors = [0xba2b46, 0xd64c6a, 0x8f162c, 0xe2738b];
+
+  for (let i = 0; i < petalCount; i++) {
+    petalData.push({
+      x: (Math.random() - 0.5) * 10,
+      y: Math.random() * 9 - 4.5,
+      z: Math.random() * 5 - 3,
+      vel: 0.25 + Math.random() * 0.35,
+      delay: Math.random() * 6,
+      sway: 0.3 + Math.random() * 0.6,
+      rotX: Math.random() * 6,
+      rotSpeed: 0.4 + Math.random() * 1.2,
+      scale: 0.7 + Math.random() * 0.9
+    });
+    petalInstancedMesh.setColorAt(i, tempColor.setHex(petalHexColors[i % 4]));
+  }
+  scene.add(petalInstancedMesh);
+  const dummyPetal = new THREE.Object3D();
+
+  // Resize handler
+  function onResize() {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  onResize();
+  window.addEventListener('resize', onResize);
+
+  // 5 Keyframes for the Heart (one per section)
+  // Format: [posX, posY, scale, rotY]
+  const keyframes = [
+    [1.5, 0.0, 1.0, 0.0],        // Sec 1: Opening (text left, heart right)
+    [-1.5, 0.3, 0.8, 1.2],       // Sec 2: Realization (text right, heart left)
+    [1.6, -0.2, 0.7, 2.4],       // Sec 3: Apology Panel (panel left, heart right)
+    [-1.5, 0.1, 0.8, 3.6],       // Sec 4: Promise (text right, heart left)
+    [0.0, 1.45, 1.05, 4.8]       // Sec 5: Finale (centered, crowned gracefully above card)
+  ];
+
+  const smoothstep = t => t * t * (3 - 2 * t);
+  const clamp01 = v => Math.max(0, Math.min(1, v));
+
+  let currentScroll = 0;
+  let mouseLerpX = 0, mouseLerpY = 0;
+  let lastTime = performance.now();
+  let animationTime = 0;
+
+  // Heart Raycaster Click Interaction
+  const raycaster = new THREE.Raycaster();
+  const pointerCoord = new THREE.Vector2();
+
+  window.addEventListener('pointermove', e => {
+    pointerCoord.set(
+      (e.clientX / window.innerWidth) * 2 - 1,
+      -(e.clientY / window.innerHeight) * 2 + 1
+    );
+    raycaster.setFromCamera(pointerCoord, camera);
+    const hits = raycaster.intersectObjects(heartGroup.children, true);
+    canvas.style.cursor = hits.length > 0 ? 'pointer' : 'default';
+  }, { passive: true });
+
+  canvas.addEventListener('pointerdown', e => {
+    pointerCoord.set(
+      (e.clientX / window.innerWidth) * 2 - 1,
+      -(e.clientY / window.innerHeight) * 2 + 1
+    );
+    raycaster.setFromCamera(pointerCoord, camera);
+    const intersects = raycaster.intersectObjects(heartGroup.children, true);
+    if (intersects.length > 0) {
+      playChime();
+      heartInteraction.burst = 1;
+      if (window.gsap) {
+        gsap.fromTo(heartInteraction, { beat: 0.18 }, { beat: 0, duration: 1.15, ease: 'elastic.out(1, 0.38)' });
+      }
+    }
+  });
+
+  // Main Render Loop
+  function animateFrame(now) {
+    requestAnimationFrame(animateFrame);
+    const delta = Math.min(0.05, (now - lastTime) / 1000);
+    lastTime = now;
+    if (!RM) animationTime += delta;
+
+    currentScroll += (targetScrollProgress - currentScroll) * (RM ? 1 : 0.065);
+    mouseLerpX += (mouse.x - mouseLerpX) * 0.05;
+    mouseLerpY += (mouse.y - mouseLerpY) * 0.05;
+
+    // Interpolate 5 keyframes
+    const scaledProg = currentScroll * 4;
+    const keyIdx = Math.min(3, Math.floor(scaledProg));
+    const factor = smoothstep(scaledProg - keyIdx);
+    const lerp = (a, b) => a + (b - a) * factor;
+
+    let heartX = lerp(keyframes[keyIdx][0], keyframes[keyIdx + 1][0]);
+    let heartY = lerp(keyframes[keyIdx][1], keyframes[keyIdx + 1][1]);
+    let heartScale = lerp(keyframes[keyIdx][2], keyframes[keyIdx + 1][2]);
+    let heartRotY = lerp(keyframes[keyIdx][3], keyframes[keyIdx + 1][3]);
+
+    if (isMobile) {
+      if (keyIdx >= 3) {
+        heartX = 0;
+        heartY = 1.65;
+        heartScale = 0.72;
+      } else {
+        heartX *= 0.25;
+        heartY += 1.1;
+        heartScale *= 0.72;
+      }
+    }
+
+    heartGroup.position.set(
+      heartX + mouseLerpX * 0.15,
+      heartY + Math.sin(animationTime * 0.9) * 0.1 - mouseLerpY * 0.1,
+      0
+    );
+    heartGroup.rotation.set(
+      mouseLerpY * 0.25 + Math.sin(animationTime * 0.6) * 0.05,
+      heartRotY + animationTime * 0.18 + mouseLerpX * 0.38,
+      0
+    );
+    heartGroup.scale.setScalar(
+      heartScale * (1 + heartInteraction.beat) * (1 + Math.sin(animationTime * 2.2) * 0.012)
+    );
+
+    // Rose growth in finale
+    const roseProgress = smoothstep(clamp01((currentScroll - 0.78) / 0.2));
+    roseGroup.scale.setScalar(0.001 + roseProgress * (isMobile ? 0.85 : 1.25));
+    roseGroup.position.set(isMobile ? 1.05 : 2.7, isMobile ? -2.3 : -1.0, 0.6);
+    roseGroup.rotation.y = animationTime * 0.25 + mouseLerpX * 0.3;
+
+    keyLight.position.x = 3.2 + mouseLerpX * 2;
+    rosePointLight.position.y = -2 - mouseLerpY * 2;
+
+    canvas.style.opacity = isMobile ? (0.5 + 0.5 * roseProgress) : 1;
+
+    // Falling Petals simulation
+    heartInteraction.burst *= 0.985;
+    const speedMultiplier = (RM ? 0.15 : 1) * (1 + heartInteraction.burst * 4);
+
+    for (let k = 0; k < petalCount; k++) {
+      const p = petalData[k];
+      p.y -= p.vel * delta * speedMultiplier;
+      if (p.y < -4.8) {
+        p.y = 4.8;
+        p.x = (Math.random() - 0.5) * 10;
+      }
+      dummyPetal.position.set(
+        p.x + Math.sin(animationTime * p.sway + p.delay) * 0.6,
+        p.y,
+        p.z + Math.cos(animationTime * p.sway + p.delay) * 0.4
+      );
+      dummyPetal.rotation.set(
+        p.rotX + animationTime * p.rotSpeed * (RM ? 0 : 1),
+        animationTime * p.rotSpeed * 0.7 * (RM ? 0 : 1) + p.delay,
+        p.delay
+      );
+      dummyPetal.scale.setScalar(p.scale * (1 + (p.z + 3) * 0.06));
+      dummyPetal.updateMatrix();
+      petalInstancedMesh.setMatrixAt(k, dummyPetal.matrix);
+    }
+    petalInstancedMesh.instanceMatrix.needsUpdate = true;
+
+    renderer.render(scene, camera);
+  }
+  requestAnimationFrame(animateFrame);
+}
+
+try {
+  init3D();
+} catch (err) {
+  console.warn("WebGL initialization caught fallback:", err);
+  const cv = $('#gl');
+  if (cv) cv.style.display = 'none';
+}
+
+})();
+</script>
+</body>
+</html>
